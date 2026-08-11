@@ -64,7 +64,7 @@ AUFGABE: Beantworte die folgende E-Mail direkt, präzise und höflich. Gehe gena
 
 REGELN:
 - Antworte ausschließlich auf Deutsch.
-- Halte die Antwort kurz (2 bis 4 Sätze).
+# - Halte die Antwort kurz (2 bis 4 Sätze).
 - Gib NUR den Antworttext aus (keine Header, kein "Subject:", keine Meta-Kommentare, keine Grußformel/Signatur am Ende).
 
 EINGEHENDE E-MAIL:
