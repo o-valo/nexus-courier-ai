@@ -188,15 +188,10 @@ Restart systemd user services:
 
 ---
 
-<p align="center">
-  <sub>Powered by AI (IBM Granite 4.1 via Ollama)</sub>
-</p>
-
-<!-- #EOF -->
 
 
 
 
-#### Powered with AI
+#### Powered by AI
 
 <!-- #EOF -->
