@@ -1,0 +1,20 @@
+# Python Virtual Environment
+venv/
+.venv/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Mailbox & Test-Daten (Sicherheit geht vor)
+*.mbox
+/var/mail/*
+
+# System- & Editor-Dateien
+.DS_Store
+.vscode/
+.idea/
+
+#EOF
