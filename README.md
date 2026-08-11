@@ -4,7 +4,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
-# Nexus-Courier-AI
+# Nexus-Courier-AI 🤖✉️
 
 ## [DE]
 `nexus-courier-ai` ist ein lokaler, ereignisgesteuerter E-Mail-Assistent für Linux-Systeme. Er überwacht eine lokale MBOX-Mailbox (z. B. befüllt durch `fetchmail`), generiert mithilfe lokaler LLMs (**getestet mit IBM Granite 4.1 / `granite4.1:8b`** über **Ollama**) automatische Antworten und versendet diese zuverlässig über die Transportschicht **`nexus-courier.sh`**.
@@ -23,7 +23,7 @@
 ```
 ┌──────────────────┐      ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────────┐
 │ Local MBOX File  │ ───> │  watch-mail.sh  │ ───> │   mail-bot.py   │ ───> │  nexus-courier.sh   │
-│ (/var/mail/user) │      │  (inotifywait)  │      │ (Ollama Chat)   │      │  (msmtp Transport)  │
+│ (/var/mail/user) │      │  (inotifywait)  │      │  (Python venv)  │      │  (msmtp Transport)  │
 └──────────────────┘      └─────────────────┘      └─────────────────┘      └─────────────────────┘
 ```
 
@@ -31,15 +31,20 @@
 1. Installiere die System-Abhängigkeiten:
    ```bash
    sudo apt update
-   sudo apt install fetchmail inotify-tools python3-pip
+   sudo apt install fetchmail inotify-tools python3-pip python3-venv
+   ```
+2. Erstelle eine virtuelle Python-Umgebung (`venv`) und installiere die Abhängigkeiten:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. Lade das Ollama-Modell:
+3. Lade das Ollama-Modell:
    ```bash
    ollama pull granite4.1:8b
    ```
-3. Passe die Pfade in `mail-bot.py` und `watch-mail.sh` an (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`).
-4. Stelle sicher, dass [nexus-courier](https://github.com/o-valo/nexus-courier) einsatzbereit ist.
+4. Passe die Pfade in `mail-bot.py` und `watch-mail.sh` an (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH` sowie den Pfad zum `venv/bin/python3`).
+5. Stelle sicher, dass [nexus-courier](https://github.com/o-valo/nexus-courier) einsatzbereit ist.
 
 ### Benutzung
 Prozess manuell starten:
@@ -77,7 +82,7 @@ Dienste (z. B. `systemd` User-Services) neu starten:
 ```
 ┌──────────────────┐      ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────────┐
 │ Local MBOX File  │ ───> │  watch-mail.sh  │ ───> │   mail-bot.py   │ ───> │  nexus-courier.sh   │
-│ (/var/mail/user) │      │  (inotifywait)  │      │ (Ollama Chat)   │      │  (msmtp Transport)  │
+│ (/var/mail/user) │      │  (inotifywait)  │      │  (Python venv)  │      │  (msmtp Transport)  │
 └──────────────────┘      └─────────────────┘      └─────────────────┘      └─────────────────────┘
 ```
 
@@ -85,15 +90,20 @@ Dienste (z. B. `systemd` User-Services) neu starten:
 1. Install system dependencies:
    ```bash
    sudo apt update
-   sudo apt install fetchmail inotify-tools python3-pip
+   sudo apt install fetchmail inotify-tools python3-pip python3-venv
+   ```
+2. Create a virtual Python environment (`venv`) and install dependencies:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. Pull the required Ollama model:
+3. Pull the required Ollama model:
    ```bash
    ollama pull granite4.1:8b
    ```
-3. Adjust paths in `mail-bot.py` and `watch-mail.sh` (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`).
-4. Ensure [nexus-courier](https://github.com/o-valo/nexus-courier) is properly configured.
+4. Adjust paths in `mail-bot.py` and `watch-mail.sh` (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`, and the path to `venv/bin/python3`).
+5. Ensure [nexus-courier](https://github.com/o-valo/nexus-courier) is properly configured.
 
 ### Usage
 Start watching manually:
