@@ -1,0 +1,6 @@
+# Python-Abhängigkeiten für Nexus-Courier-AI (v1.0.3)
+# Installation über venv: pip install -r requirements.txt
+
+requests>=2.25.0    # Für die API-Kommunikation mit Ollama (/api/chat)
+
+#EOF
