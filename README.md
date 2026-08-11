@@ -4,54 +4,107 @@
 ![Version](https://img.shields.io/badge/version-1.0.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
-# Nexus-Courier-AI (v1.0.3) 🤖✉️
+# Nexus-Courier-AI
 
-**Nexus-Courier-AI** ist ein lokaler, ereignisgesteuerter E-Mail-Assistent für Linux-Systeme. Er überwacht eingehende E-Mails (z. B. via Maildir/`inotifywait`), generiert mithilfe lokaler LLMs (**getestet mit IBM Granite 4.1 / `granite4.1:8b`** über **Ollama**) automatische Antworten und versendet diese zuverlässig über die Transportschicht **`nexus-courier`**.
+## [DE]
+`nexus-courier-ai` ist ein lokaler, ereignisgesteuerter E-Mail-Assistent für Linux-Systeme. Er überwacht eine lokale MBOX-Mailbox (z. B. befüllt durch `fetchmail`), generiert mithilfe lokaler LLMs (**getestet mit IBM Granite 4.1 / `granite4.1:8b`** über **Ollama**) automatische Antworten und versendet diese zuverlässig über die Transportschicht **`nexus-courier.sh`**.
 
-100 % lokal, datenschutzfreundlich und modular aufgebaut (nach der UNIX-Philosophie).
+100 % lokal, datenschutzfreundlich und modular aufgebaut nach der UNIX-Philosophie.
 
----
+### Funktionen
+- **Ereignisgesteuert:** `watch-mail.sh` lauscht per `inotifywait` auf MBOX-Änderungen und ignoriert leere Mailboxen (<= 14 Bytes).
+- **MBOX-Parsing:** `mail-bot.py` verarbeitet multiple Nachrichten aus MBOX-Dateien, dekodiert MIME-Header und bereinigt Signaturen.
+- **Lokale KI:** Nutzt die Ollama-Chat-API (`/api/chat`) mit striktem System-Prompt für kurze, präzise E-Mail-Antworten.
+- **Transportschicht-Abstraktion:** Übergibt Antworten mit erzwungenem `Re:`-Betreff an `nexus-courier.sh`.
+- **Automatischer Cleanup:** Leert die MBOX-Datei sicher nach erfolgreicher Verarbeitung aller Nachrichten.
+- **Systemd-Integration:** Enthält Skripte zur Steuerung von User-Services (`fetchmail.service`, `mail-watcher.service`).
 
-## 🏗️ Architektur & Funktionsweise
-
+### Architektur & Ablauf
 ```
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐      ┌─────────────────────┐
-│  Maildir / New  │ ───> │ mail-watcher.sh  │ ───> │   mail-bot.py   │ ───> │  nexus-courier.sh   │
-│ (Eingang Mail)  │      │  (inotifywait)   │      │ (Ollama Python) │      │  (msmtp Transport)  │
-└─────────────────┘      └──────────────────┘      └─────────────────┘      └─────────────────────┘
+┌──────────────────┐      ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────────┐
+│ Local MBOX File  │ ───> │  watch-mail.sh  │ ───> │   mail-bot.py   │ ───> │  nexus-courier.sh   │
+│ (/var/mail/user) │      │  (inotifywait)  │      │ (Ollama Chat)   │      │  (msmtp Transport)  │
+└──────────────────┘      └─────────────────┘      └─────────────────┘      └─────────────────────┘
 ```
 
-1. **`mail-watcher.sh` (Event-Wächter v1.0.3):** Lauert über `inotify` auf neu eintreffende Dateien im Mail-Ordner.
-2. **`mail-bot.py` (Gehirn v1.0.3):** Parst die E-Mail, schickt den Inhalt an IBM Granite 4.1 (`granite4.1:8b`) via Ollama und erstellt die Antwort.
-3. **`nexus-courier.sh` (Postbote):** Übernimmt den E-Mail-Versand via `msmtp` mit Betreff (`-s`) und Anhängen (`-a`).
+### Installation & Einrichtung
+1. Installiere die System-Abhängigkeiten:
+   ```bash
+   sudo apt update
+   sudo apt install fetchmail inotify-tools python3-pip
+   pip install -r requirements.txt
+   ```
+2. Lade das Ollama-Modell:
+   ```bash
+   ollama pull granite4.1:8b
+   ```
+3. Passe die Pfade in `mail-bot.py` und `watch-mail.sh` an (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`).
+4. Stelle sicher, dass [nexus-courier](https://github.com/o-valo/nexus-courier) einsatzbereit ist.
 
----
-
-## 🚀 System-Voraussetzungen
-
-- **Linux-Server / Raspberry Pi**
-- **[Ollama](https://ollama.com/)** (Getestet mit Modell **`granite4.1:8b`**)
-- **`msmtp`** (für den Mailversand)
-- **`inotify-tools`** (für das File-System-Monitoring)
-- **Python 3.8+**
-
----
-
-## 🛠️ Quickstart
-
+### Benutzung
+Prozess manuell starten:
 ```bash
-# Modell in Ollama bereitstellen
-ollama pull granite4.1:8b
+./watch-mail.sh
+```
 
-# Bot mit Beispiel-Mail testen
-python3 mail-bot.py /path/to/sample_email.eml
+Dienste (z. B. `systemd` User-Services) neu starten:
+```bash
+./restart-mail-services.sh
 ```
 
 ---
 
-## 📜 Lizenz
+![Python](https://img.shields.io/badge/language-python-blue)
+![Bash](https://img.shields.io/badge/language-bash-green)
+![Ollama](https://img.shields.io/badge/Ollama-Granite_4.1--8b-orange)
+![Version](https://img.shields.io/badge/version-1.0.3-blue)
+![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
-MIT License – Siehe [LICENSE](LICENSE) für Details.
+## [ENG]
+`nexus-courier-ai` is a local, event-driven email assistant for Linux systems. It monitors a local MBOX file (e.g. populated via `fetchmail`), generates automated responses using local LLMs (**tested with IBM Granite 4.1 / `granite4.1:8b`** via **Ollama**), and dispatches them reliably through the **`nexus-courier.sh`** transport layer.
+
+100% local, privacy-friendly, and built modularly following the UNIX philosophy.
+
+### Features
+- **Event-Driven:** `watch-mail.sh` monitors MBOX modifications via `inotifywait`, ignoring empty file changes (<= 14 bytes).
+- **MBOX Parsing:** `mail-bot.py` parses multiple messages, decodes MIME headers, and strips incoming signatures.
+- **Local AI Integration:** Uses the Ollama Chat API (`/api/chat`) with strict system prompts for short, concise replies.
+- **Transport Abstraction:** Passes generated responses with forced `Re:` prefix to `nexus-courier.sh`.
+- **Automatic Cleanup:** Safely truncates the MBOX file after successful processing.
+- **Systemd Integration:** Includes management scripts for user-level services (`fetchmail.service`, `mail-watcher.service`).
+
+### Architecture
+```
+┌──────────────────┐      ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────────┐
+│ Local MBOX File  │ ───> │  watch-mail.sh  │ ───> │   mail-bot.py   │ ───> │  nexus-courier.sh   │
+│ (/var/mail/user) │      │  (inotifywait)  │      │ (Ollama Chat)   │      │  (msmtp Transport)  │
+└──────────────────┘      └─────────────────┘      └─────────────────┘      └─────────────────────┘
+```
+
+### Installation & Setup
+1. Install system dependencies:
+   ```bash
+   sudo apt update
+   sudo apt install fetchmail inotify-tools python3-pip
+   pip install -r requirements.txt
+   ```
+2. Pull the required Ollama model:
+   ```bash
+   ollama pull granite4.1:8b
+   ```
+3. Adjust paths in `mail-bot.py` and `watch-mail.sh` (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`).
+4. Ensure [nexus-courier](https://github.com/o-valo/nexus-courier) is properly configured.
+
+### Usage
+Start watching manually:
+```bash
+./watch-mail.sh
+```
+
+Restart background services (`systemd` user units):
+```bash
+./restart-mail-services.sh
+```
 
 ---
 
