@@ -1,4 +1,3 @@
-cat << 'EOF' > README.md
 ![Python](https://img.shields.io/badge/language-python-blue)
 ![Bash](https://img.shields.io/badge/language-bash-green)
 ![Ollama](https://img.shields.io/badge/Ollama-Granite_4.1--8b-orange)
