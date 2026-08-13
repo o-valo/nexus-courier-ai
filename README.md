@@ -1,3 +1,4 @@
+cat << 'EOF' > README.md
 ![Python](https://img.shields.io/badge/language-python-blue)
 ![Bash](https://img.shields.io/badge/language-bash-green)
 ![Ollama](https://img.shields.io/badge/Ollama-Granite_4.1--8b-orange)
@@ -11,10 +12,12 @@
 
 ### Architektur & Ablauf
 
+~~~text
 +-------------------+      +---------------+      +---------------------+      +------------------+
 |  Local MBOX File  | ---> | watch-mail.sh | ---> | mail-bot-eng-deu.py | ---> | nexus-courier.sh |
 | (/var/mail/user)  |      | (inotifywait) |      | (Python venv v1.0.4)|      | (msmtp Transport)|
 +-------------------+      +---------------+      +---------------------+      +------------------+
+~~~
 
 ### Funktionsweise
 * `watch-mail.sh` überwacht die MBOX-Datei via `inotifywait` auf Änderungen (Ignoriert Dateigrößen <= 14 Bytes, um Fehlstarts bei symbolischen Links / Symlink-Pfaden zu vermeiden).
@@ -29,11 +32,15 @@ Mit der Version 1.0.4 wurde das Skript in `mail-bot-eng-deu.py` umbenannt. Es en
 Die Steuerung der Sprache erfolgt über den System-Prompt in der Funktion `ask_ollama()` innerhalb von `mail-bot-eng-deu.py`:
 
 * **Automatisch (DE / EN) [Standard in v1.0.4]:**
+  ~~~python
   REGELN:
   - Antworte in der Sprache, in der die eingehende E-Mail verfasst ist (Deutsch oder Englisch).
+  ~~~
 * **Rein Deutsch:**
+  ~~~python
   REGELN:
   - Antworte ausschließlich auf Deutsch.
+  ~~~
 
 ### Voraussetzungen
 * Linux (Debian/Ubuntu/Raspberry Pi OS)
@@ -44,20 +51,26 @@ Die Steuerung der Sprache erfolgt über den System-Prompt in der Funktion `ask_o
 ### Installation & Einrichtung
 
 #### 1. Repository klonen
+~~~bash
 cd ~/progs
-git clone https://github.com/o-valo/nexus-courier-ai.git
+git clone [https://github.com/o-valo/nexus-courier-ai.git](https://github.com/o-valo/nexus-courier-ai.git)
 cd nexus-courier-ai
+~~~
 
 #### 2. Paketabhängigkeiten & venv
+~~~bash
 sudo apt update
 sudo apt install fetchmail inotify-tools python3-pip python3-venv
 
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+~~~
 
 #### 3. Ollama Modell laden
+~~~bash
 ollama pull granite4.1:8b
+~~~
 
 #### 4. Konfiguration
 Passe die Pfade in `mail-bot-eng-deu.py` und `watch-mail.sh` an (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`, Python-Binary).
@@ -65,6 +78,7 @@ Passe die Pfade in `mail-bot-eng-deu.py` und `watch-mail.sh` an (`OLLAMA_HOST`, 
 #### 5. Einbindung als Systemd User-Service (Autostart)
 Um `watch-mail.sh` automatisch im Hintergrund laufen zu lassen, erstelle eine Service-Datei unter `~/.config/systemd/user/mail-watcher.service`:
 
+~~~ini
 [Unit]
 Description=Mail Watcher Service for Nexus Courier AI
 After=network.target
@@ -77,18 +91,25 @@ RestartSec=5
 
 [Install]
 WantedBy=default.target
+~~~
 
 Dienst aktivieren und starten:
+~~~bash
 systemctl --user daemon-reload
 systemctl --user enable mail-watcher.service
 systemctl --user start mail-watcher.service
+~~~
 
 ### Nutzung
 Skript manuell im Hintergrund starten:
+~~~bash
 ./watch-mail.sh
+~~~
 
 Systemd User-Services neu laden/starten:
+~~~bash
 ./restart-mail-services.sh
+~~~
 
 ---
 
@@ -103,10 +124,12 @@ Systemd User-Services neu laden/starten:
 
 ### Architecture
 
+~~~text
 +-------------------+      +---------------+      +---------------------+      +------------------+
 |  Local MBOX File  | ---> | watch-mail.sh | ---> | mail-bot-eng-deu.py | ---> | nexus-courier.sh |
 | (/var/mail/user)  |      | (inotifywait) |      | (Python venv v1.0.4)|      | (msmtp Transport)|
 +-------------------+      +---------------+      +---------------------+      +------------------+
+~~~
 
 ### How it works
 * `watch-mail.sh` monitors the MBOX file using `inotifywait` (Ignores file sizes <= 14 bytes to prevent false triggers on symbolic link paths).
@@ -121,11 +144,15 @@ Starting with v1.0.4, the script is named `mail-bot-eng-deu.py` and introduces a
 Language selection is handled via the system prompt inside the `ask_ollama()` function in `mail-bot-eng-deu.py`:
 
 * **Automatic (DE / EN) [Default in v1.0.4]:**
+  ~~~python
   REGELN:
   - Antworte in der Sprache, in der die eingehende E-Mail verfasst ist (Deutsch oder Englisch).
+  ~~~
 * **Strict German:**
+  ~~~python
   REGELN:
   - Antworte ausschließlich auf Deutsch.
+  ~~~
 
 ### Requirements
 * Linux
@@ -136,20 +163,26 @@ Language selection is handled via the system prompt inside the `ask_ollama()` fu
 ### Setup & Installation
 
 #### 1. Clone repository
+~~~bash
 cd ~/progs
-git clone https://github.com/o-valo/nexus-courier-ai.git
+git clone [https://github.com/o-valo/nexus-courier-ai.git](https://github.com/o-valo/nexus-courier-ai.git)
 cd nexus-courier-ai
+~~~
 
 #### 2. Dependencies & venv
+~~~bash
 sudo apt update
 sudo apt install fetchmail inotify-tools python3-pip python3-venv
 
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+~~~
 
 #### 3. Pull Ollama Model
+~~~bash
 ollama pull granite4.1:8b
+~~~
 
 #### 4. Configuration
 Configure local paths in `mail-bot-eng-deu.py` and `watch-mail.sh` (`OLLAMA_HOST`, `MAILBOX_PATH`, `COURIER_PATH`, Python binary).
@@ -157,6 +190,7 @@ Configure local paths in `mail-bot-eng-deu.py` and `watch-mail.sh` (`OLLAMA_HOST
 #### 5. Systemd User Service Setup (Autostart)
 To run `watch-mail.sh` automatically in the background, create `~/.config/systemd/user/mail-watcher.service`:
 
+~~~ini
 [Unit]
 Description=Mail Watcher Service for Nexus Courier AI
 After=network.target
@@ -169,21 +203,29 @@ RestartSec=5
 
 [Install]
 WantedBy=default.target
+~~~
 
 Enable and start the user service:
+~~~bash
 systemctl --user daemon-reload
 systemctl --user enable mail-watcher.service
 systemctl --user start mail-watcher.service
+~~~
 
 ### Usage
 Run manually:
+~~~bash
 ./watch-mail.sh
+~~~
 
 Restart systemd user services:
+~~~bash
 ./restart-mail-services.sh
+~~~
 
 ---
 
 #### Powered by AI
 
 #EOF
+EOF
